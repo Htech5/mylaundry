@@ -7,6 +7,11 @@ import { X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 import {
+  sendWhatsApp,
+  msgOrderCreated,
+} from "@/lib/whatsapp";
+
+import {
   PACKAGE_TYPES,
   KILOAN_SERVICES,
   SATUAN_SERVICES,
@@ -19,6 +24,7 @@ import {
 export default function OrderFormModal({
   open,
   onClose,
+  order = null,
 }) {
   const router = useRouter();
   const supabase = createClient();
@@ -51,6 +57,38 @@ export default function OrderFormModal({
     serviceType === "kiloan"
       ? KILOAN_SERVICES
       : SATUAN_SERVICES;
+
+  useEffect(() => {
+    if (!order) return;
+
+    setCustomerName(
+      order.customer_name || ""
+    );
+
+    setCustomerPhone(
+      order.customer_phone || ""
+    );
+
+    setPackageType(
+      order.package_type || "Reguler"
+    );
+
+    setServiceType(
+      order.service_type || "kiloan"
+    );
+
+    setServiceId(
+      order.service_id || ""
+    );
+
+    setQuantity(
+      order.quantity || 1
+    );
+
+    setNotes(
+      order.notes || ""
+    );
+  }, [order]);
 
   useEffect(() => {
     if (services.length > 0) {
@@ -200,72 +238,156 @@ export default function OrderFormModal({
           newCustomer.id;
       }
 
-      const {
-        error: orderError,
-      } = await supabase
-        .from("orders")
-        .insert({
-          order_number:
-            orderNumber,
+      let orderError;
 
-          branch,
+      if (order) {
+        const result =
+          await supabase
+            .from("orders")
+            .update({
+              customer_name:
+                customerName,
 
-          customer_id:
-            customerId,
+              customer_phone:
+                customerPhone,
 
-          customer_name:
-            customerName,
+              package_type:
+                packageType,
 
-          customer_phone:
+              service_type:
+                serviceType,
+
+              service_id:
+                serviceId,
+
+              service_label:
+                selectedService?.label ||
+                "",
+
+              quantity:
+                Number(quantity),
+
+              unit:
+                serviceType ===
+                "kiloan"
+                  ? "kg"
+                  : "pcs",
+
+              price_per_unit:
+                Number(pricePerUnit),
+
+              total_price:
+                Number(totalPrice),
+
+              notes,
+            })
+            .eq("id", order.id);
+
+        orderError =
+          result.error;
+      } else {
+        const result =
+          await supabase
+            .from("orders")
+            .insert({
+              order_number:
+                orderNumber,
+
+              branch,
+
+              customer_id:
+                customerId,
+
+              customer_name:
+                customerName,
+
+              customer_phone:
+                customerPhone,
+
+              package_type:
+                packageType,
+
+              service_type:
+                serviceType,
+
+              service_id:
+                serviceId,
+
+              service_label:
+                selectedService?.label ||
+                "",
+
+              quantity:
+                Number(quantity),
+
+              unit:
+                serviceType ===
+                "kiloan"
+                  ? "kg"
+                  : "pcs",
+
+              price_per_unit:
+                Number(pricePerUnit),
+
+              total_price:
+                Number(totalPrice),
+
+              wash_status:
+                "pending",
+
+              payment_status:
+                "unpaid",
+
+              amount_paid: 0,
+
+              notes,
+            });
+
+        orderError =
+          result.error;
+
+        if (!orderError) {
+          sendWhatsApp(
             customerPhone,
-
-          package_type:
-            packageType,
-
-          service_type:
-            serviceType,
-
-          service_id:
-            serviceId,
-
-          service_label:
-            selectedService?.label ||
-            "",
-
-          quantity:
-            Number(quantity),
-
-          unit:
-            serviceType ===
-            "kiloan"
-              ? "kg"
-              : "pcs",
-
-          price_per_unit:
-            Number(pricePerUnit),
-
-          total_price:
-            Number(totalPrice),
-
-          wash_status:
-            "pending",
-
-          payment_status:
-            "unpaid",
-
-          amount_paid: 0,
-
-          notes,
-        });
+            msgOrderCreated({
+              orderNumber,
+              customerName,
+              packageType,
+              serviceLabel:
+                selectedService?.label ||
+                "",
+              totalPrice,
+            })
+          ).catch(console.error);
+        }
+      }
 
       if (orderError)
         throw orderError;
 
-      resetForm();
+    // Kirim WhatsApp otomatis
+    sendWhatsApp(
+      customerPhone,
+      msgOrderCreated({
+        orderNumber,
+        customerName,
+        packageType,
+        serviceLabel:
+          selectedService?.label || "",
+        totalPrice,
+      })
+    ).catch((err) =>
+      console.error(
+        "WhatsApp Error:",
+        err
+      )
+    );
 
-      onClose();
+    resetForm();
 
-      router.refresh();
+    onClose();
+
+    router.refresh();
     } catch (error) {
       console.error(error);
 
@@ -286,9 +408,11 @@ export default function OrderFormModal({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <div>
-            <h2 className="text-xl font-bold text-slate-800">
-              Tambah Pesanan
-            </h2>
+          <h2 className="text-xl font-bold text-slate-800">
+            {order
+              ? "Edit Pesanan"
+              : "Tambah Pesanan"}
+          </h2>
 
             <p className="text-sm text-slate-500">
               Buat transaksi laundry
@@ -319,7 +443,7 @@ export default function OrderFormModal({
                   e.target.value
                 )
               }
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-600 font-medium"
             />
           </div>
 
@@ -336,7 +460,7 @@ export default function OrderFormModal({
                   e.target.value
                 )
               }
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-600 font-medium"
             />
           </div>
 
@@ -506,6 +630,8 @@ export default function OrderFormModal({
           >
             {saving
               ? "Menyimpan..."
+              : order
+              ? "Simpan Perubahan"
               : "Simpan Pesanan"}
           </button>
         </div>

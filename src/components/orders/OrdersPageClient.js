@@ -1,5 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+import {
+  sendWhatsApp,
+  msgStatusUpdated,
+} from "@/lib/whatsapp";
+
 import { useMemo, useState } from "react";
 import {
   Plus,
@@ -14,6 +22,10 @@ export default function OrdersPageClient({
   branch,
 }) {
   const [search, setSearch] = useState("");
+  const [editingOrder, setEditingOrder] =
+      useState(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   const [showModal, setShowModal] =
     useState(false);
@@ -50,6 +62,69 @@ export default function OrdersPageClient({
     orders.filter(
       (o) => o.wash_status === "done"
     ).length;
+    
+  const updateStatus = async (
+    order,
+    newStatus
+  ) => {
+    try {
+      const { error } =
+        await supabase
+          .from("orders")
+          .update({
+            wash_status: newStatus,
+          })
+          .eq("id", order.id);
+
+      if (error) throw error;
+
+      sendWhatsApp(
+        order.customer_phone,
+        msgStatusUpdated({
+          orderNumber:
+            order.order_number,
+          customerName:
+            order.customer_name,
+          newStatus,
+        })
+      ).catch(console.error);
+
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert(
+        "Gagal mengubah status"
+      );
+    }
+  };
+
+  const deleteOrder = async (
+    orderId
+  ) => {
+    const ok = confirm(
+      "Hapus pesanan ini?"
+    );
+
+    if (!ok) return;
+
+    try {
+      const { error } =
+        await supabase
+          .from("orders")
+          .delete()
+          .eq("id", orderId);
+
+      if (error) throw error;
+
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        "Gagal menghapus pesanan"
+      );
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -221,31 +296,31 @@ export default function OrdersPageClient({
                     key={order.id}
                     className="border-b"
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-800">
                       {order.order_number}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-800">
                       {order.customer_name}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-800">
                       {order.customer_phone}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-800">
                       {order.service_label}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-800">
                       {order.package_type}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-800">
                       {order.quantity}
                     </td>
 
-                    <td className="px-4 py-3 font-medium">
+                    <td className="px-4 py-3 font-medium text-slate-800">
                       Rp{" "}
                       {Number(
                         order.total_price
@@ -253,20 +328,82 @@ export default function OrdersPageClient({
                     </td>
 
                     <td className="px-4 py-3">
-                      {order.wash_status}
+                      <select
+                        value={order.wash_status}
+                        onChange={(e) =>
+                          updateStatus(
+                            order,
+                            e.target.value
+                          )
+                        }
+                        className="
+                          rounded-lg
+                          border
+                          border-slate-200
+                          px-3 py-2
+                          text-sm
+                          text-slate-700
+                        "
+                      >
+                        <option value="pending">
+                          Pending
+                        </option>
+
+                        <option value="process">
+                          Proses
+                        </option>
+
+                        <option value="done">
+                          Selesai
+                        </option>
+                      </select>
                     </td>
 
                     <td className="px-4 py-3">
-                      {order.payment_status}
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                          order.payment_status ===
+                          "paid"
+                            ? "bg-green-600 text-white"
+                            : "bg-red-600 text-white"
+                        }`}
+                      >
+                        {order.payment_status ===
+                        "paid"
+                          ? "Lunas"
+                          : "Belum"}
+                      </span>
                     </td>
 
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <button className="rounded-lg bg-blue-50 px-3 py-1 text-sm text-blue-600">
+                        <button
+                          onClick={() =>
+                            setEditingOrder(order)
+                          }
+                          className="
+                            rounded-lg
+                            bg-blue-600
+                            px-3 py-1
+                            text-sm
+                            text-white
+                          "
+                        >
                           Edit
                         </button>
 
-                        <button className="rounded-lg bg-red-50 px-3 py-1 text-sm text-red-600">
+                        <button
+                          onClick={() =>
+                            deleteOrder(order.id)
+                          }
+                          className="
+                            rounded-lg
+                            bg-red-600
+                            px-3 py-1
+                            text-sm
+                            text-white
+                          "
+                        >
                           Hapus
                         </button>
                       </div>
@@ -280,10 +417,15 @@ export default function OrdersPageClient({
       </div>
 
       <OrderFormModal
-        open={showModal}
-        onClose={() =>
-          setShowModal(false)
+        open={
+          showModal ||
+          !!editingOrder
         }
+        order={editingOrder}
+        onClose={() => {
+          setShowModal(false);
+          setEditingOrder(null);
+        }}
       />
     </div>
   );

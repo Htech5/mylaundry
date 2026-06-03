@@ -1,90 +1,136 @@
-/**
- * Fonnte WA Bot (https://fonnte.com)
- * Gratis: scan QR dari dashboard Fonnte → dapat token → kirim WA
- * Daftar di fonnte.com, verifikasi nomor WA, ambil token di pengaturan perangkat
- */
+// =====================================================
+// WhatsApp Helper
+// Menggunakan API internal:
+// POST /api/whatsapp
+// =====================================================
 
-const FONNTE_TOKEN = process.env.FONNTE_TOKEN; // set di .env.local
-
-export async function sendWhatsApp(phone, message) {
-  if (!FONNTE_TOKEN) {
-    console.warn("[WA] FONNTE_TOKEN not set, skipping WA notification");
-    return { success: false, reason: "no_token" };
-  }
-
-  // Normalisasi nomor: 08xxx → 628xxx
-  const normalized = phone
-    .replace(/\D/g, "")
-    .replace(/^0/, "62");
-
+export async function sendWhatsApp(
+  phone,
+  message
+) {
   try {
-    const res = await fetch("https://api.fonnte.com/send", {
-      method: "POST",
-      headers: {
-        Authorization: FONNTE_TOKEN,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        target: normalized,
-        message,
-        countryCode: "62",
-      }),
-    });
+    const response = await fetch(
+      "/api/whatsapp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          phone,
+          message,
+        }),
+      }
+    );
 
-    const data = await res.json();
-    return { success: data.status, data };
-  } catch (err) {
-    console.error("[WA] Error sending:", err);
-    return { success: false, error: err.message };
+    return await response.json();
+  } catch (error) {
+    console.error(
+      "[WA_ERROR]",
+      error
+    );
+
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 }
 
-// Template pesan
-export function msgOrderCreated({ orderNumber, customerName, packageType, serviceLabel, totalPrice }) {
+// =====================================================
+// Pesan saat order dibuat
+// =====================================================
+
+export function msgOrderCreated({
+  orderNumber,
+  customerName,
+  packageType,
+  serviceLabel,
+  totalPrice,
+}) {
   return `Halo *${customerName}* 👋
 
-Pesanan laundry Anda telah diterima!
+Pesanan laundry Anda telah diterima.
 
 📋 *No. Pesanan:* ${orderNumber}
 📦 *Paket:* ${packageType}
 🧺 *Layanan:* ${serviceLabel}
-💰 *Total:* Rp ${totalPrice.toLocaleString("id-ID")}
+💰 *Total:* Rp ${Number(
+    totalPrice
+  ).toLocaleString("id-ID")}
 
-Status saat ini: *PENDING*
+⏳ *Status:* PENDING
+
 Kami akan segera memproses cucian Anda.
 
-Terima kasih telah menggunakan layanan myLaundry 🙏`;
+Terima kasih telah menggunakan layanan *SpinTrack* 🙏`;
 }
 
-export function msgStatusUpdated({ orderNumber, customerName, newStatus }) {
+// =====================================================
+// Pesan saat status berubah
+// =====================================================
+
+export function msgStatusUpdated({
+  orderNumber,
+  customerName,
+  newStatus,
+}) {
   const statusLabel = {
     pending: "⏳ PENDING",
-    process: "🔄 SEDANG DIPROSES",
+    process:
+      "🔄 SEDANG DIPROSES",
     done: "✅ SELESAI",
-  }[newStatus] || newStatus;
+  };
+
+  const statusText =
+    statusLabel[newStatus] ||
+    newStatus;
 
   return `Halo *${customerName}* 👋
 
-Update status pesanan Anda:
+Ada pembaruan status untuk pesanan Anda.
 
 📋 *No. Pesanan:* ${orderNumber}
-🔖 *Status:* ${statusLabel}
+🔖 *Status:* ${statusText}
 
-${newStatus === "done" ? "Cucian Anda sudah selesai dan siap diambil! 🎉" : "Kami sedang mengerjakan cucian Anda."}
-
-myLaundry 🧺`;
+${
+  newStatus === "done"
+    ? "🎉 Cucian Anda telah selesai dan siap diambil."
+    : "Kami sedang mengerjakan cucian Anda."
 }
 
-export function msgPaymentReceived({ orderNumber, customerName, amountPaid, remaining }) {
+Terima kasih telah menggunakan *SpinTrack* 🙏`;
+}
+
+// =====================================================
+// Pesan saat pembayaran diterima
+// =====================================================
+
+export function msgPaymentReceived({
+  orderNumber,
+  customerName,
+  amountPaid,
+  remaining,
+}) {
   return `Halo *${customerName}* 👋
 
-Konfirmasi pembayaran diterima:
+Pembayaran berhasil kami terima.
 
 📋 *No. Pesanan:* ${orderNumber}
-💵 *Dibayar:* Rp ${amountPaid.toLocaleString("id-ID")}
-${remaining > 0
-  ? `💳 *Sisa:* Rp ${remaining.toLocaleString("id-ID")} (Proses Pelunasan)`
-  : "✅ *Status:* LUNAS"}
+💵 *Dibayar:* Rp ${Number(
+    amountPaid
+  ).toLocaleString("id-ID")}
 
-Terima kasih! myLaundry 🧺`;
+${
+  remaining > 0
+    ? `💳 *Sisa Tagihan:* Rp ${Number(
+        remaining
+      ).toLocaleString(
+        "id-ID"
+      )}`
+    : "✅ *Status Pembayaran:* LUNAS"
+}
+
+Terima kasih telah menggunakan *SpinTrack* 🙏`;
 }
