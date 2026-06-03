@@ -1,5 +1,9 @@
 "use client";
+import { createClient }
+from "@/lib/supabase/client";
 
+import { useRouter }
+from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   Plus,
@@ -17,8 +21,17 @@ export default function CashPageClient({
   const [search, setSearch] =
     useState("");
 
+  const supabase =
+    createClient();
+
+  const router =
+    useRouter();
+
   const [showModal, setShowModal] =
     useState(false);
+
+  const [editingCash, setEditingCash] =
+    useState(null);
 
   const filteredEntries =
     useMemo(() => {
@@ -64,6 +77,28 @@ export default function CashPageClient({
 
   const balance =
     totalIncome - totalExpense;
+
+    const deleteCash = async (id) => {
+    const confirmDelete =
+        confirm(
+        "Hapus transaksi ini?"
+        );
+
+    if (!confirmDelete) return;
+
+    const { error } =
+        await supabase
+        .from("cash_entries")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    router.refresh();
+    };
 
   return (
     <div className="space-y-6">
@@ -208,6 +243,9 @@ export default function CashPageClient({
                 <th className="px-4 py-3 text-left text-slate-600">
                   Nominal
                 </th>
+                <th className="px-4 py-3 text-left text-slate-600">
+                Aksi
+                </th>
               </tr>
             </thead>
 
@@ -277,6 +315,43 @@ export default function CashPageClient({
                           "id-ID"
                         )}
                       </td>
+                    <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                        <button
+                        onClick={() =>
+                            setEditingCash(item)
+                        }
+                        className="
+                            rounded-lg
+                            bg-blue-50
+                            px-3
+                            py-1
+                            text-sm
+                            text-blue-600
+                            hover:bg-blue-100
+                        "
+                        >
+                        Edit
+                        </button>
+
+                        <button
+                        onClick={() =>
+                            deleteCash(item.id)
+                        }
+                        className="
+                            rounded-lg
+                            bg-red-50
+                            px-3
+                            py-1
+                            text-sm
+                            text-red-600
+                            hover:bg-red-100
+                        "
+                        >
+                        Hapus
+                        </button>
+                    </div>
+                    </td>
                     </tr>
                   )
                 )
@@ -286,12 +361,17 @@ export default function CashPageClient({
         </div>
       </div>
 
-      <CashFormModal
-        open={showModal}
-        onClose={() =>
-          setShowModal(false)
+        <CashFormModal
+        open={
+            showModal ||
+            !!editingCash
         }
-      />
+        editingCash={editingCash}
+        onClose={() => {
+            setShowModal(false);
+            setEditingCash(null);
+        }}
+        />
     </div>
   );
 }

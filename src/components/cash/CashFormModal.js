@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 
@@ -10,6 +10,7 @@ import { BRANCHES } from "@/lib/constants";
 export default function CashFormModal({
   open,
   onClose,
+  editingCash,
 }) {
   const router = useRouter();
   const supabase = createClient();
@@ -35,6 +36,19 @@ export default function CashFormModal({
         .toISOString()
         .split("T")[0]
     );
+    useEffect(() => {
+    if (!editingCash) return;
+
+    setName(editingCash.name);
+    setBranch(editingCash.branch);
+    setType(editingCash.type);
+    setAmount(editingCash.amount);
+
+    setDate(
+        editingCash.created_at
+        ?.split("T")[0]
+    );
+    }, [editingCash]);
 
   const resetForm = () => {
         setName("");
@@ -49,6 +63,7 @@ export default function CashFormModal({
         );
     };
 
+    
   const saveCash = async () => {
     try {
       if (!name.trim()) {
@@ -71,15 +86,35 @@ export default function CashFormModal({
       setSaving(true);
 
       const { error } =
+        if (editingCash) {
         await supabase
-          .from("cash_entries")
-            .insert({
-            branch,
+            .from("cash_entries")
+            .update({
             name,
-            amount: Number(amount),
+            branch,
             type,
-            created_at: `${date}T12:00:00`,
+            amount:
+                Number(amount),
+            created_at:
+                `${date}T12:00:00`,
             })
+            .eq(
+            "id",
+            editingCash.id
+            );
+        } else {
+        await supabase
+            .from("cash_entries")
+            .insert({
+            name,
+            branch,
+            type,
+            amount:
+                Number(amount),
+            created_at:
+                `${date}T12:00:00`,
+            });
+        }
 
       if (error) throw error;
 
@@ -109,7 +144,9 @@ export default function CashFormModal({
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <div>
             <h2 className="text-xl font-bold text-slate-800">
-              Transaksi Kas
+            {editingCash
+                ? "Edit Transaksi"
+                : "Transaksi Kas"}        
             </h2>
 
             <p className="text-sm text-slate-500">
