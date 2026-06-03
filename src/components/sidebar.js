@@ -20,27 +20,27 @@ import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   {
-    href: "/dashboard",
+    href: "/admin/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
   },
   {
-    href: "/orders",
+    href: "/admin/orders",
     label: "Pesanan",
     icon: ShoppingBag,
   },
   {
-    href: "/payments",
+    href: "/admin/payments",
     label: "Pembayaran",
     icon: CreditCard,
   },
   {
-    href: "/cash",
+    href: "/admin/cash",
     label: "Kas",
     icon: Wallet,
   },
   {
-    href: "/reports",
+    href: "/admin/reports",
     label: "Laporan",
     icon: BarChart3,
   },
@@ -102,14 +102,14 @@ export default function Sidebar({ branch, userName }) {
               onClick={() => setMobileOpen(false)}
               className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all ${
                 active
-                  ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-sm"
+                  ? "bg-blue-500 text-white font-bold border border-blue-700 shadow-sm"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <Icon
                 className={`h-4 w-4 flex-shrink-0 ${
                   active
-                    ? "text-blue-600"
+                    ? "text-white font-bold"
                     : "text-slate-400 group-hover:text-slate-700"
                 }`}
               />
@@ -117,7 +117,7 @@ export default function Sidebar({ branch, userName }) {
               <span>{label}</span>
 
               {active && (
-                <ChevronRight className="ml-auto h-4 w-4 text-blue-600" />
+                <ChevronRight className="ml-auto h-4 w-4 text-white font-bold" />
               )}
             </Link>
           );
@@ -152,7 +152,7 @@ export default function Sidebar({ branch, userName }) {
           className="
             flex w-full items-center gap-3
             rounded-xl
-            border border-red-100
+            border border-red-600
             px-3 py-3
             text-sm font-medium
             text-red-600
