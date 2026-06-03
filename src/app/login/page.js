@@ -57,97 +57,250 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-4">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
-      </div>
+   <div className="min-h-screen bg-gradient-to-br from-blue-100 via-sky-50 to-indigo-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl bg-white rounded-[28px] overflow-hidden shadow-[0_20px_60px_rgba(15,23,42,0.08)] grid lg:grid-cols-2">
 
-      <div className="w-full max-w-md relative z-10 animate-slide-up">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-500/10 border border-primary-500/30 rounded-2xl mb-4">
-            <WashingMachine className="w-8 h-8 text-primary-400" />
+        {/* LEFT SIDE */}
+        <div className="relative hidden lg:block">
+
+          <img
+            src="/images/laundry-hero.jpg"
+            alt="Laundry"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-blue-600/20 to-blue-700/80" />
+
+          {/* Content */}
+          <div className="absolute inset-0 flex flex-col justify-between p-10 text-white">
+
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-5 w-fit">
+              <div className="flex items-center gap-3">
+                <div className="w-18 h-18 rounded-xl bg-blue-600 flex items-center justify-center">
+                  <img
+                    src="/favicon.ico"
+                    alt="Logo"
+                    className="w-12 h-12"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-slate-900 text-lg">
+                    SpinTrack
+                  </h3>
+                  <p className="text-slate-500 text-sm">
+                    Manajemen Laundry Multi-Cabang
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h1 className="text-5xl font-bold leading-tight max-w-lg">
+                Kelola Laundry
+                <br />
+                Lebih Efisien
+              </h1>
+
+              <p className="mt-5 text-lg text-blue-50 max-w-md">
+                Pantau operasional, transaksi dan laporan seluruh cabang
+                dalam satu dashboard modern.
+              </p>
+
+              <div className="grid grid-cols-3 gap-4 mt-10">
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4">
+                  <p className="font-semibold">Real-time</p>
+                  <p className="text-xs text-blue-100 mt-1">
+                    Monitoring transaksi
+                  </p>
+                </div>
+
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4">
+                  <p className="font-semibold">Multi Cabang</p>
+                  <p className="text-xs text-blue-100 mt-1">
+                    Kelola semua outlet
+                  </p>
+                </div>
+
+                <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4">
+                  <p className="font-semibold">Aman</p>
+                  <p className="text-xs text-blue-100 mt-1">
+                    Data tersimpan aman
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-white">SpinTrack</h1>
-          <p className="text-slate-400 text-sm mt-1">Manajemen Laundry Multi-Cabang</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-surface-card border border-surface-border rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-lg font-semibold text-white mb-6">Masuk ke Akun Anda</h2>
+        {/* RIGHT SIDE */}
+        <div className="flex items-center justify-center p-8 lg:p-12">
+          <div className="w-full max-w-sd">
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Branch */}
-            <div>
-              <label className="label">Cabang</label>
-              <select
-                className="input"
-                value={form.branch}
-                onChange={(e) => setForm((f) => ({ ...f, branch: e.target.value }))}
-                required
-              >
-                <option value="">Pilih Cabang</option>
-                {BRANCHES.map((b) => (
-                  <option key={b} value={b}>{b}</option>
-                ))}
-              </select>
+            <div className="mb-10">
+              <h2 className="text-4xl font-bold text-slate-900">
+                Welcome Back
+              </h2>
+
+              <p className="text-slate-500 mt-3">
+                Masuk ke akun SpinTrack Anda
+              </p>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="label">Email</label>
-              <input
-                type="email"
-                className="input"
-                placeholder="email@mylaundry.id"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Password */}
-            <div>
-              <label className="label">Password</label>
-              <div className="relative">
-                <input
-                  type={showPw ? "text" : "password"}
-                  className="input pr-10"
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-                  onClick={() => setShowPw((v) => !v)}
+              {/* Cabang */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-800 mb-2">
+                  Cabang
+                </label>
+
+                <select
+                  value={form.branch}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      branch: e.target.value,
+                    }))
+                  }
+                    className="
+                        w-full
+                        h-12
+                        px-4
+                        rounded-xl
+                        bg-slate-50
+                        border
+                        border-slate-200
+                        text-slate-900
+                        focus:bg-white
+                        focus:border-blue-500
+                        focus:ring-4
+                        focus:ring-blue-100
+                        outline-none
+                      "
                 >
-                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+                  <option value="">Pilih Cabang</option>
 
-            {/* Error */}
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-400">
-                {error}
+                  {BRANCHES.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
-            >
-              {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Masuk...</>
-              ) : "Masuk"}
-            </button>
-          </form>
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  placeholder="email@mylaundry.id"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      email: e.target.value,
+                    }))
+                  }
+                  className="
+                    w-full
+                    h-12
+                    px-4
+                    rounded-xl
+                    bg-slate-50
+                    border
+                    border-slate-200
+                    text-slate-900
+                    placeholder:text-slate-400
+                    focus:bg-white
+                    focus:border-blue-500
+                    focus:ring-4
+                    focus:ring-blue-100
+                    outline-none
+                    "
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Password
+                </label>
+
+                <div className="relative">
+                  <input
+                    type={showPw ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        password: e.target.value,
+                      }))
+                    }
+                    className="
+                    w-full
+                    h-12
+                    px-4
+                    rounded-xl
+                    bg-slate-50
+                    border
+                    border-slate-200
+                    text-slate-900
+                    placeholder:text-slate-400
+                    focus:bg-white
+                    focus:border-blue-500
+                    focus:ring-4
+                    focus:ring-blue-100
+                    outline-none
+                    "
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPw(!showPw)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  >
+                    {showPw ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <button
+                disabled={loading}
+                type="submit"
+                className="w-full h-14 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Masuk...
+                  </>
+                ) : (
+                  "Masuk"
+                )}
+              </button>
+            </form>
+
+            <p className="text-center text-sm text-slate-400 mt-8">
+              © 2025 SpinTrack. Semua hak dilindungi.
+            </p>
+          </div>
         </div>
       </div>
     </div>

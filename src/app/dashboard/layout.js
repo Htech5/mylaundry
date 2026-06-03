@@ -4,24 +4,36 @@ import Sidebar from "@/components/Sidebar";
 
 export default async function AppLayout({ children }) {
   const supabase = createServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!session) redirect("/login");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("branch, full_name")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
-  const branch = profile?.branch || "Unknown";
-  const userName = profile?.full_name || session.user.email?.split("@")[0] || "Admin";
+  const branch   = profile?.branch;
+  const userName = profile?.full_name || user.email?.split("@")[0] || "Admin";
 
   return (
-    <div className="flex min-h-screen bg-surface">
+    <div className="flex min-h-screen bg-slate-100">
       <Sidebar branch={branch} userName={userName} />
-      <main className="flex-1 min-w-0 lg:overflow-auto pt-16 lg:pt-0">
-        {children}
+
+      {/*
+        On mobile: push content down below the fixed top bar (h-14 = 56px).
+        On desktop: no top offset needed.
+      */}
+      <main className="flex-1 min-w-0 overflow-auto pt-14 lg:pt-0">
+        <div className="p-4 md:p-6 lg:p-8">
+          {children}
+        </div>
       </main>
     </div>
   );
