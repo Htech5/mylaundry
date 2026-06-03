@@ -24,18 +24,30 @@ export async function middleware(request) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  const protectedRoutes = ["/dashboard", "/orders", "/payments", "/cash", "/reports"];
+  const protectedRoutes = ["/admin/dashboard", "/admin/orders", "/admin/payments", "/admin/cash", "/admin/reports"];
   const isProtected = protectedRoutes.some((r) => pathname.startsWith(r));
 
-  if (!session && isProtected) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (!user && isProtected) {
+    return NextResponse.redirect(
+      new URL("/admin/login", request.url)
+    );
   }
 
-  if (session && pathname === "/login") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  if (
+    user &&
+    pathname === "/admin/login"
+  ) {
+    return NextResponse.redirect(
+      new URL(
+        "/admin/dashboard",
+        request.url
+      )
+    );
   }
 
   return response;

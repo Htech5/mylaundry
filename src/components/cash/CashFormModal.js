@@ -64,76 +64,85 @@ export default function CashFormModal({
     };
 
     
-  const saveCash = async () => {
+    const saveCash = async () => {
     try {
-      if (!name.trim()) {
+        if (!name.trim()) {
         alert(
-          "Nama transaksi wajib diisi"
+            "Nama transaksi wajib diisi"
         );
         return;
-      }
+        }
 
-      if (
+        if (
         !amount ||
         Number(amount) <= 0
-      ) {
+        ) {
         alert(
-          "Nominal tidak valid"
+            "Nominal tidak valid"
         );
         return;
-      }
+        }
 
-      setSaving(true);
+        setSaving(true);
 
-      const { error } =
+        let error = null;
+
         if (editingCash) {
-        await supabase
+        const result =
+            await supabase
             .from("cash_entries")
             .update({
-            name,
-            branch,
-            type,
-            amount:
+                name,
+                branch,
+                type,
+                amount:
                 Number(amount),
-            created_at:
+                created_at:
                 `${date}T12:00:00`,
             })
             .eq(
-            "id",
-            editingCash.id
+                "id",
+                editingCash.id
             );
+
+        error = result.error;
         } else {
-        await supabase
+        const result =
+            await supabase
             .from("cash_entries")
             .insert({
-            name,
-            branch,
-            type,
-            amount:
+                name,
+                branch,
+                type,
+                amount:
                 Number(amount),
-            created_at:
+                created_at:
                 `${date}T12:00:00`,
             });
+
+        error = result.error;
         }
 
-      if (error) throw error;
+        if (error) {
+        throw error;
+        }
 
-      resetForm();
+        resetForm();
 
-      onClose();
+        onClose();
 
-      router.refresh();
+        router.refresh();
     } catch (error) {
-      console.error(error);
+        console.error(error);
 
-      alert(
+        alert(
         error.message ||
-          "Gagal menyimpan transaksi"
-      );
+            "Gagal menyimpan transaksi"
+        );
     } finally {
-      setSaving(false);
+        setSaving(false);
     }
-  };
+    };
 
   if (!open) return null;
 
@@ -292,8 +301,10 @@ export default function CashFormModal({
             className="rounded-xl bg-blue-600 px-5 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {saving
-              ? "Menyimpan..."
-              : "Simpan"}
+            ? "Menyimpan..."
+            : editingCash
+                ? "Update"
+                : "Simpan"}
           </button>
         </div>
       </div>
