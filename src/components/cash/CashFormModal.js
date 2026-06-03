@@ -29,12 +29,25 @@ export default function CashFormModal({
   const [amount, setAmount] =
     useState("");
 
+  const [date, setDate] =
+    useState(
+        new Date()
+        .toISOString()
+        .split("T")[0]
+    );
+
   const resetForm = () => {
-    setName("");
-    setBranch(BRANCHES[0]);
-    setType("in");
-    setAmount("");
-  };
+        setName("");
+        setBranch(BRANCHES[0]);
+        setType("in");
+        setAmount("");
+
+        setDate(
+            new Date()
+            .toISOString()
+            .split("T")[0]
+        );
+    };
 
   const saveCash = async () => {
     try {
@@ -60,13 +73,13 @@ export default function CashFormModal({
       const { error } =
         await supabase
           .from("cash_entries")
-          .insert({
+            .insert({
             branch,
             name,
-            amount:
-              Number(amount),
+            amount: Number(amount),
             type,
-          });
+            created_at: `${date}T12:00:00`,
+            })
 
       if (error) throw error;
 
@@ -201,7 +214,31 @@ export default function CashFormModal({
               className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-700"
             />
           </div>
+            <div>
+                    <label className="mb-1 block font-medium text-slate-600">
+                        Tanggal
+                    </label>
+
+                    <input
+                        type="date"
+                        value={date}
+                        onChange={(e) =>
+                        setDate(e.target.value)
+                        }
+                        className="
+                        w-full
+                        rounded-xl
+                        border
+                        border-slate-200
+                        px-4
+                        py-3
+                        text-slate-700
+                        "
+                    />
+                    </div>
         </div>
+
+        
 
         {/* Footer */}
         <div className="flex justify-end gap-3 border-t border-slate-200 p-5">
