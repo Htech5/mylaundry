@@ -24,7 +24,15 @@ export async function sendWhatsApp(
       }
     );
 
-    return await response.json();
+    const data =
+      await response.json();
+
+    console.log(
+      "[WA CLIENT]",
+      data
+    );
+
+    return data;
   } catch (error) {
     console.error(
       "[WA_ERROR]",

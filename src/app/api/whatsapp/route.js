@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 
 const FONNTE_TOKEN = process.env.FONNTE_TOKEN;
 
+console.log(
+  "TOKEN ADA?",
+  !!FONNTE_TOKEN
+);
+
 export async function POST(request) {
   try {
     if (!FONNTE_TOKEN) {
@@ -48,6 +53,10 @@ export async function POST(request) {
     );
 
     const data = await response.json();
+    console.log(
+      "[FONNTE RESPONSE]",
+      JSON.stringify(data, null, 2)
+    );
 
     return NextResponse.json({
       success: true,
