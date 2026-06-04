@@ -19,43 +19,18 @@ export default async function ReportsPage() {
     redirect("/login");
   }
 
-  const [
-    ordersResult,
-    paymentsResult,
-    cashResult,
-  ] = await Promise.all([
-    supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", {
-        ascending: false,
-      }),
-
-    supabase
-      .from("payments")
-      .select("*")
-      .order("created_at", {
-        ascending: false,
-      }),
-
-    supabase
+  const { data: cashEntries } =
+    await supabase
       .from("cash_entries")
       .select("*")
       .order("created_at", {
         ascending: false,
-      }),
-  ]);
+      });
 
   return (
     <ReportsPageClient
-      orders={
-        ordersResult.data || []
-      }
-      payments={
-        paymentsResult.data || []
-      }
       cashEntries={
-        cashResult.data || []
+        cashEntries || []
       }
     />
   );

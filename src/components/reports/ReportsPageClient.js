@@ -142,6 +142,31 @@ export default function ReportsPageClient({
     totalCashIn -
     totalCashOut;
 
+  const branchSummary =
+    filteredOrders.reduce(
+        (acc, order) => {
+        const branch =
+            order.branch ||
+            "Unknown";
+
+        if (!acc[branch]) {
+            acc[branch] = {
+            orders: 0,
+            omzet: 0,
+            };
+        }
+
+        acc[branch].orders += 1;
+
+        acc[branch].omzet += Number(
+            order.total_price || 0
+        );
+
+        return acc;
+        },
+        {}
+    );
+    
   const regularCount =
     filteredOrders.filter(
       (o) =>
@@ -196,7 +221,8 @@ export default function ReportsPageClient({
       "_blank"
     );
   };
-
+    console.log("ORDERS", orders);
+    console.log("FILTERED", filteredOrders);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -253,11 +279,6 @@ export default function ReportsPageClient({
 
       {/* Summary */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Card
-          title="Total Order"
-          value={totalOrders}
-          icon={<ShoppingBag />}
-        />
 
         <Card
           title="Omzet"
@@ -267,13 +288,6 @@ export default function ReportsPageClient({
           icon={<CreditCard />}
         />
 
-        <Card
-          title="Pembayaran"
-          value={`Rp ${totalPayment.toLocaleString(
-            "id-ID"
-          )}`}
-          icon={<Wallet />}
-        />
 
         <Card
           title="Saldo Kas"
@@ -284,163 +298,83 @@ export default function ReportsPageClient({
         />
       </div>
 
-      {/* Statistik */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h3 className="mb-4 font-bold text-slate-800">
-            Statistik Order
-          </h3>
-
-          <div className="space-y-2 text-slate-700">
-            <p>
-              Reguler :
-              {" "}
-              {regularCount}
-            </p>
-
-            <p>
-              Express :
-              {" "}
-              {expressCount}
-            </p>
-
-            <p>
-              Pending :
-              {" "}
-              {pendingCount}
-            </p>
-
-            <p>
-              Proses :
-              {" "}
-              {processCount}
-            </p>
-
-            <p>
-              Selesai :
-              {" "}
-              {doneCount}
-            </p>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h3 className="mb-4 font-bold text-slate-800">
-            Statistik Pembayaran
-          </h3>
-
-          <div className="space-y-2 text-slate-700">
-            <p>
-              Lunas :
-              {" "}
-              {paidCount}
-            </p>
-
-            <p>
-              Belum Lunas :
-              {" "}
-              {unpaidCount}
-            </p>
-
-            <p>
-              Pemasukan Kas :
-              {" "}
-              Rp{" "}
-              {totalCashIn.toLocaleString(
-                "id-ID"
-              )}
-            </p>
-
-            <p>
-              Pengeluaran Kas :
-              {" "}
-              Rp{" "}
-              {totalCashOut.toLocaleString(
-                "id-ID"
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Orders */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b p-4">
-          <h3 className="font-bold text-slate-800">
-            Detail Order
-          </h3>
+            <h3 className="font-bold text-slate-800">
+            Detail Kas
+            </h3>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
+            <table className="w-full">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="px-4 py-3 text-left">
-                  No Order
+                <tr className="bg-slate-50">
+                <th className="px-4 py-3 text-left text-slate-600">
+                    Tanggal
                 </th>
 
-                <th className="px-4 py-3 text-left">
-                  Cabang
+                <th className="px-4 py-3 text-left text-slate-600">
+                    Cabang
                 </th>
 
-                <th className="px-4 py-3 text-left">
-                  Pelanggan
+                <th className="px-4 py-3 text-left text-slate-600">
+                    Nama
                 </th>
 
-                <th className="px-4 py-3 text-left">
-                  Paket
+                <th className="px-4 py-3 text-left text-slate-600">
+                    Jenis
                 </th>
 
-                <th className="px-4 py-3 text-left">
-                  Total
+                <th className="px-4 py-3 text-left text-slate-600">
+                    Nominal
                 </th>
-              </tr>
+                </tr>
             </thead>
 
             <tbody>
-              {filteredOrders.map(
+                {filteredCash.map(
                 (item) => (
-                  <tr
+                    <tr
                     key={item.id}
                     className="border-t"
-                  >
-                    <td className="px-4 py-3">
-                      {
-                        item.order_number
-                      }
-                    </td>
-
-                    <td className="px-4 py-3">
-                      {item.branch}
-                    </td>
-
-                    <td className="px-4 py-3">
-                      {
-                        item.customer_name
-                      }
-                    </td>
-
-                    <td className="px-4 py-3">
-                      {
-                        item.package_type
-                      }
-                    </td>
-
-                    <td className="px-4 py-3">
-                      Rp{" "}
-                      {Number(
-                        item.total_price
-                      ).toLocaleString(
+                    >
+                    <td className="px-4 py-3 !text-slate-700    ">
+                        {new Date(
+                        item.created_at
+                        ).toLocaleDateString(
                         "id-ID"
-                      )}
+                        )}
                     </td>
-                  </tr>
+
+                    <td className="px-4 py-3 !text-slate-700">
+                        {item.branch}
+                    </td>
+
+                    <td className="px-4 py-3 !text-slate-700">
+                        {item.name}
+                    </td>
+
+                    <td className="px-4 py-3 text-slate-700">
+                        {item.type === "in"
+                        ? "Pemasukan"
+                        : "Pengeluaran"}
+                    </td>
+
+                    <td className="px-4 py-3 !text-slate-700">
+                        Rp{" "}
+                        {Number(
+                        item.amount
+                        ).toLocaleString(
+                        "id-ID"
+                        )}
+                    </td>
+                    </tr>
                 )
-              )}
+                )}
             </tbody>
-          </table>
+            </table>
         </div>
-      </div>
+        </div>
     </div>
   );
 }
