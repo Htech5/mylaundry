@@ -68,8 +68,19 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>
-      <div className="w-full max-w-6xl bg-white rounded-[28px] overflow-hidden shadow-[0_20px_60px_rgba(15,23,42,0.08)] grid lg:grid-cols-2">
-
+      <div className="
+        relative
+        z-10
+        w-full
+        max-w-6xl
+        bg-white/95
+        backdrop-blur-md
+        rounded-[28px]
+        overflow-hidden
+        shadow-[0_20px_60px_rgba(15,23,42,0.08)]
+        grid
+        lg:grid-cols-2
+      ">
         {/* LEFT SIDE */}
         <div className="relative hidden lg:block">
 
@@ -148,6 +159,28 @@ export default function LoginPage() {
         {/* RIGHT SIDE */}
         <div className="flex items-center justify-center p-8 lg:p-12">
           <div className="w-full max-w-md">
+            <div className="lg:hidden flex justify-center mb-8">
+              <div className="bg-white/90 backdrop-blur-md rounded-2xl px-5 py-4 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
+                    <img
+                      src="/favicon.ico"
+                      alt="Logo"
+                      className="w-8 h-8"
+                    />
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-slate-900">
+                      SpinTrack
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Manajemen Laundry
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div className="mb-10">
               <h2 className="text-4xl font-bold text-slate-900">
