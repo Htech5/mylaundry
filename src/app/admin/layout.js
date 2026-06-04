@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createServerClient } from "@/lib/supabase/server";
-import Sidebar from "@/components/sidebar";
+import Sidebar from "@/components/Sidebar";
 
 export default async function AppLayout({ children }) {
   const supabase = createServerClient();
