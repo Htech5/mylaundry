@@ -137,7 +137,7 @@ export default function LoginPage() {
 
         {/* RIGHT SIDE */}
         <div className="flex items-center justify-center p-8 lg:p-12">
-          <div className="w-full max-w-sd">
+          <div className="w-full max-w-md">
 
             <div className="mb-10">
               <h2 className="text-4xl font-bold text-slate-900">
