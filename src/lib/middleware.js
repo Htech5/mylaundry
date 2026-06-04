@@ -34,13 +34,13 @@ export async function middleware(request) {
 
   if (!user && isProtected) {
     return NextResponse.redirect(
-      new URL("/admin/login", request.url)
+      new URL("/login", request.url)
     );
   }
 
   if (
     user &&
-    pathname === "/admin/login"
+    pathname === "/login"
   ) {
     return NextResponse.redirect(
       new URL(
