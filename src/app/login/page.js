@@ -45,7 +45,7 @@ export default function LoginPage() {
         throw new Error("Cabang tidak sesuai dengan akun ini.");
       }
 
-      router.push("/dashboard");
+      router.push("/admin/dashboard");
       router.refresh();
     } catch (err) {
       setError(err.message === "Invalid login credentials"
