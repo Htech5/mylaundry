@@ -57,7 +57,17 @@ export default function LoginPage() {
   };
 
   return (
-   <div className="min-h-screen bg-gradient-to-br from-blue-100 via-sky-50 to-indigo-50 flex items-center justify-center p-6">
+    <div className="relative min-h-screen flex items-center justify-center p-4 lg:p-6">
+
+      {/* Background Mobile */}
+      <div className="absolute inset-0 lg:hidden">
+        <img
+          src="/images/laundry-hero.jpg"
+          alt="Laundry"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
       <div className="w-full max-w-6xl bg-white rounded-[28px] overflow-hidden shadow-[0_20px_60px_rgba(15,23,42,0.08)] grid lg:grid-cols-2">
 
         {/* LEFT SIDE */}

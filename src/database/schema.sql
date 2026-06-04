@@ -121,10 +121,10 @@ CREATE TRIGGER orders_updated_at
 -- Seed Users (jalankan SETELAH membuat akun di Supabase Auth)
 -- Cara: Supabase Dashboard → Authentication → Users → Add User
 -- Buat 4 akun ini:
---   semarang@mylaundry.id  / pass: Laundry@2025
---   jakarta@mylaundry.id   / pass: Laundry@2025
---   surabaya@mylaundry.id  / pass: Laundry@2025
---   bandung@mylaundry.id   / pass: Laundry@2025
+--   semarang@mylaundry.id  / pass: Laundry@2026
+--   jakarta@mylaundry.id   / pass: Laundry@2026
+--   surabaya@mylaundry.id  / pass: Laundry@2026
+--   bandung@mylaundry.id   / pass: Laundry@2026
 -- Lalu jalankan insert profiles di bawah dengan UUID dari Auth
 -- ================================================================
 
